@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Copy, Check, Wand2, FileCode, AlertCircle, Plus, Sparkles, Rocket, RefreshCw } from 'lucide-react';
+import { useState } from 'react';
+import { Copy, Check, Wand2, AlertCircle, Plus, Sparkles, Rocket, RefreshCw } from 'lucide-react';
 
 const templates = {
   build: {
@@ -86,8 +86,11 @@ const snippets = {
   }
 };
 
+type TemplateKey = keyof typeof templates;
+type FieldKey = 'context' | 'technical' | 'constraints' | 'acceptance' | 'userFlow' | 'errorHandling' | 'testCases';
+
 export default function CodingPromptGenerator() {
-  const [selectedTemplate, setSelectedTemplate] = useState('build');
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateKey>('build');
   const [task, setTask] = useState('');
   const [context, setContext] = useState('');
   const [technical, setTechnical] = useState('');
@@ -99,9 +102,9 @@ export default function CodingPromptGenerator() {
   const [copied, setCopied] = useState(false);
 
   const currentTemplate = templates[selectedTemplate];
-  const showField = (field) => currentTemplate.showFields.includes(field);
+  const showField = (field: string) => currentTemplate.showFields.includes(field);
 
-  const loadTemplate = (templateKey) => {
+  const loadTemplate = (templateKey: TemplateKey) => {
     setSelectedTemplate(templateKey);
     const template = templates[templateKey];
     setTask(template.defaults.task || '');
@@ -114,8 +117,8 @@ export default function CodingPromptGenerator() {
     setTestCases('');
   };
 
-  const insertSnippet = (field, snippetText) => {
-    const setters = {
+  const insertSnippet = (field: FieldKey, snippetText: string) => {
+    const setters: Record<FieldKey, (value: string) => void> = {
       context: setContext,
       technical: setTechnical,
       constraints: setConstraints,
@@ -124,8 +127,8 @@ export default function CodingPromptGenerator() {
       errorHandling: setErrorHandling,
       testCases: setTestCases
     };
-    
-    const getters = {
+
+    const getters: Record<FieldKey, string> = {
       context, technical, constraints, acceptance, userFlow, errorHandling, testCases
     };
 
@@ -134,7 +137,7 @@ export default function CodingPromptGenerator() {
     setters[field](newValue);
   };
 
-  const SnippetButton = ({ label, onClick }) => (
+  const SnippetButton = ({ label, onClick }: { label: string; onClick: () => void }) => (
     <button
       onClick={onClick}
       className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 rounded transition-colors"
@@ -196,7 +199,7 @@ export default function CodingPromptGenerator() {
                   return (
                     <button
                       key={key}
-                      onClick={() => loadTemplate(key)}
+                      onClick={() => loadTemplate(key as TemplateKey)}
                       className={`flex items-start gap-3 p-4 border-2 rounded-lg transition-all text-left ${
                         isSelected
                           ? 'border-blue-500 bg-blue-50'
